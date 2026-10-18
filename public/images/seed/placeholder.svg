@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="No photo">
+  <rect width="1200" height="800" fill="#E7EDE4"/>
+  <g fill="none" stroke="#7E9A7A" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" transform="translate(600 400)">
+    <!-- Three chasing arrows (recycle symbol) -->
+    <g id="arrow">
+      <path d="M-34 -118 L34 -118 L92 -18"/>
+      <path d="M62 -40 L92 -18 L118 -50"/>
+    </g>
+    <use href="#arrow" transform="rotate(120)"/>
+    <use href="#arrow" transform="rotate(240)"/>
+    <!-- Leaf in the centre -->
+    <path d="M-30 34 C-30 -14 4 -40 40 -42 C42 -4 18 30 -30 34 Z"/>
+    <path d="M-30 34 L14 -8"/>
+  </g>
+</svg>

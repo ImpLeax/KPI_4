@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title data-i18n="meta.ideaFallbackTitle"></title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script type="module" src="/js/pages/idea.js"></script>
+  </head>
+  <body class="min-h-dvh">
+    <a href="#main" class="skip-link" data-i18n="nav.skip"></a>
+    <div id="site-header"></div>
+
+    <main id="main" tabindex="-1" class="focus:outline-none">
+      <div class="container-page">
+        <a
+          href="/"
+          class="inline-flex min-h-11 items-center gap-2 rounded-full pr-3 font-bold text-forest-dark underline-offset-4 hover:underline"
+        >
+          <span data-icon="arrowLeft" data-icon-class="size-5"></span>
+          <span data-i18n="idea.back"></span>
+        </a>
+      </div>
+
+      <!-- Loading -->
+      <div id="idea-loading" class="container-page mt-4" role="status" aria-busy="true">
+        <span class="sr-only" data-i18n="idea.loading"></span>
+        <div class="grid gap-10 lg:grid-cols-2" aria-hidden="true">
+          <div class="flex flex-col gap-4 pt-6">
+            <div class="skeleton h-6 w-28 rounded-full"></div>
+            <div class="skeleton h-14 w-4/5 rounded-2xl"></div>
+            <div class="skeleton h-5 w-full rounded-full"></div>
+            <div class="skeleton h-5 w-2/3 rounded-full"></div>
+          </div>
+          <div class="skeleton blob-frame aspect-[5/4] w-full"></div>
+        </div>
+      </div>
+
+      <!-- Not found -->
+      <section
+        id="idea-not-found"
+        class="container-page mt-6"
+        aria-labelledby="not-found-title"
+        data-testid="not-found"
+        hidden
+      >
+        <div class="flex flex-col items-center rounded-[2rem] bg-sage-200 px-6 py-16 text-center">
+          <span class="flex size-16 items-center justify-center rounded-full bg-paper text-forest">
+            <span data-icon="sprout" data-icon-class="size-8"></span>
+          </span>
+          <h1
+            id="not-found-title"
+            class="mt-5 text-3xl text-ink sm:text-4xl"
+            data-i18n="idea.notFoundTitle"
+          ></h1>
+          <p class="mt-3 max-w-md text-ink" data-i18n="idea.notFoundText"></p>
+          <a href="/" class="btn btn-primary mt-7" data-i18n="idea.toCatalog"></a>
+        </div>
+      </section>
+
+      <!-- Load error -->
+      <section
+        id="idea-error"
+        class="container-page mt-6"
+        role="alert"
+        data-testid="error-state"
+        hidden
+      >
+        <div
+          class="flex flex-col items-center rounded-[2rem] bg-danger-soft px-6 py-14 text-center"
+        >
+          <span data-icon="alert" data-icon-class="size-10 text-danger"></span>
+          <h1 class="mt-4 text-3xl text-ink" data-i18n="idea.loadErrorTitle"></h1>
+          <p id="idea-error-text" class="mt-2 max-w-md text-ink"></p>
+          <button id="idea-retry" type="button" class="btn btn-forest mt-6">
+            <span data-icon="rotate" data-icon-class="size-5"></span>
+            <span data-i18n="results.retry"></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Idea -->
+      <article id="idea" aria-labelledby="idea-title" data-testid="idea-detail" hidden>
+        <section class="relative overflow-hidden pb-24 sm:pb-28">
+          <svg
+            class="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[56%] text-sage-300 lg:block"
+            viewBox="0 0 800 700"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path
+              fill="currentColor"
+              d="M170 0C90 90 200 180 130 290C70 380 0 420 30 520C50 590 30 650 0 700H800V0Z"
+            />
+          </svg>
+
+          <div
+            class="container-page relative grid items-center gap-10 pt-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16"
+          >
+            <div class="hero-rise">
+              <p class="tag bg-sage-200 text-forest-dark">
+                <span data-icon="tag" data-icon-class="size-4"></span>
+                <span class="sr-only" data-i18n="idea.categoryLabel"></span>
+                <span id="idea-category" data-testid="idea-category"></span>
+              </p>
+              <h1
+                id="idea-title"
+                class="mt-4 text-4xl leading-[1.08] text-ink sm:text-5xl lg:text-[3.5rem]"
+                data-testid="idea-title"
+              ></h1>
+              <p
+                id="idea-description"
+                class="mt-5 max-w-[60ch] text-lg text-ink-muted"
+                data-testid="idea-description"
+              ></p>
+
+              <dl class="mt-7 flex flex-wrap gap-3">
+                <div class="flex items-center gap-3 rounded-2xl bg-paper px-4 py-3 shadow-soft">
+                  <dt class="sr-only" data-i18n="idea.difficultyLabel"></dt>
+                  <dd id="idea-difficulty" data-testid="idea-difficulty"></dd>
+                </div>
+                <div class="flex items-center gap-3 rounded-2xl bg-paper px-4 py-3 shadow-soft">
+                  <dt class="sr-only" data-i18n="idea.timeLabel"></dt>
+                  <dd id="idea-time" data-testid="idea-time"></dd>
+                </div>
+              </dl>
+
+              <div class="mt-8 flex flex-wrap gap-3">
+                <a
+                  id="idea-edit"
+                  href="/idea-form.html"
+                  class="btn btn-forest"
+                  data-testid="idea-edit"
+                >
+                  <span data-icon="pencil" data-icon-class="size-5"></span>
+                  <span data-i18n="idea.edit"></span>
+                </a>
+                <button
+                  id="idea-delete"
+                  type="button"
+                  class="btn btn-danger"
+                  data-testid="idea-delete"
+                >
+                  <span data-icon="trash" data-icon-class="size-5"></span>
+                  <span data-i18n="idea.delete"></span>
+                </button>
+              </div>
+            </div>
+
+            <figure class="hero-rise-delay mx-auto w-full max-w-xl lg:max-w-none">
+              <div class="blob-frame bg-sage-300 p-3 sm:p-4 lg:bg-transparent lg:p-0">
+                <img
+                  id="idea-photo"
+                  class="blob-frame aspect-[16/10] w-full bg-sage-200 object-cover shadow-lift sm:aspect-[5/4]"
+                  alt=""
+                  width="800"
+                  height="640"
+                  data-testid="idea-photo"
+                />
+              </div>
+            </figure>
+          </div>
+
+          <svg
+            class="pointer-events-none absolute inset-x-0 bottom-0 h-16 w-full sm:h-24"
+            viewBox="0 0 1440 120"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path
+              class="fill-sage-200"
+              d="M0 64C220 10 420 18 640 52C880 90 1120 96 1440 30V120H0Z"
+            />
+            <path
+              class="fill-cream"
+              d="M0 92C260 52 480 60 720 84C960 108 1200 110 1440 70V120H0Z"
+            />
+          </svg>
+        </section>
+
+        <div
+          class="container-page mt-4 grid gap-8 lg:grid-cols-[21.5rem_minmax(0,1fr)] lg:items-start lg:gap-12"
+        >
+          <aside class="panel p-6" aria-labelledby="materials-heading" data-testid="idea-materials">
+            <h2 id="materials-heading" class="flex items-center gap-3 text-2xl text-ink">
+              <span data-icon="package" data-icon-class="size-6 text-forest"></span>
+              <span data-i18n="idea.materials"></span>
+            </h2>
+
+            <h3
+              class="mt-5 text-base font-sans font-extrabold text-forest-dark"
+              data-i18n="idea.required"
+            ></h3>
+            <ul
+              id="materials-required"
+              class="mt-2 flex flex-col gap-2"
+              data-testid="materials-required"
+            ></ul>
+
+            <div id="materials-optional-block" hidden>
+              <h3
+                class="mt-5 text-base font-sans font-extrabold text-forest-dark"
+                data-i18n="idea.optional"
+              ></h3>
+              <ul
+                id="materials-optional"
+                class="mt-2 flex flex-col gap-2"
+                data-testid="materials-optional"
+              ></ul>
+            </div>
+
+            <h2
+              class="mt-8 flex items-center gap-3 border-t border-sage-300 pt-6 text-2xl text-ink"
+            >
+              <span data-icon="hammer" data-icon-class="size-6 text-forest"></span>
+              <span data-i18n="idea.tools"></span>
+            </h2>
+            <ul id="idea-tools" class="mt-3 flex flex-wrap gap-2" data-testid="idea-tools"></ul>
+            <p id="idea-no-tools" class="mt-3 text-ink-muted" data-i18n="idea.noTools" hidden></p>
+          </aside>
+
+          <section aria-labelledby="steps-heading">
+            <div class="flex flex-wrap items-baseline justify-between gap-3">
+              <h2
+                id="steps-heading"
+                class="text-3xl text-ink sm:text-4xl"
+                data-i18n="idea.steps"
+              ></h2>
+              <p id="steps-count" class="font-semibold text-ink-muted"></p>
+            </div>
+            <ol id="idea-steps" class="mt-6 flex flex-col gap-4" data-testid="step-list"></ol>
+          </section>
+        </div>
+      </article>
+
+      <dialog
+        id="delete-dialog"
+        class="dialog"
+        aria-labelledby="delete-title"
+        data-testid="delete-dialog"
+      >
+        <form method="dialog" class="p-6 sm:p-8">
+          <span
+            class="flex size-12 items-center justify-center rounded-full bg-danger-soft text-danger"
+          >
+            <span data-icon="trash" data-icon-class="size-6"></span>
+          </span>
+          <h2 id="delete-title" class="mt-4 text-2xl text-ink" data-i18n="idea.deleteTitle"></h2>
+          <p id="delete-text" class="mt-2 text-ink"></p>
+          <p id="delete-error" class="field-error" role="alert" hidden></p>
+          <div class="mt-7 flex flex-wrap justify-end gap-3">
+            <button
+              type="submit"
+              value="cancel"
+              class="btn btn-ghost"
+              data-i18n="idea.deleteCancel"
+              data-testid="delete-cancel"
+              autofocus
+            ></button>
+            <button
+              id="delete-confirm"
+              type="button"
+              class="btn btn-danger-solid"
+              data-i18n="idea.deleteConfirm"
+              data-testid="delete-confirm"
+            ></button>
+          </div>
+        </form>
+      </dialog>
+    </main>
+
+    <div id="site-footer"></div>
+  </body>
+</html>

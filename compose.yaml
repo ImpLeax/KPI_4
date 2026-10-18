@@ -1,0 +1,18 @@
+services:
+  app:
+    build: .
+    image: upcycling-app:latest
+    container_name: upcycling-app
+    restart: unless-stopped
+    ports:
+      # HOST_PORT is the port opened on this computer (and forwarded on the router).
+      - "${HOST_PORT:-8080}:3000"
+    environment:
+      RATE_LIMIT: ${RATE_LIMIT:-100}
+    volumes:
+      - upcycling-data:/app/data
+      - upcycling-uploads:/app/uploads
+
+volumes:
+  upcycling-data:
+  upcycling-uploads:

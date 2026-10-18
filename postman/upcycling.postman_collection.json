@@ -1,0 +1,1168 @@
+{
+  "info": {
+    "name": "Upcycling Ideas API",
+    "description": "Requests for every endpoint of the upcycling recommendation API (see server/docs/openapi.yaml). Run against a freshly reset database (npm run db:reset): expected ids come from server/db/SEED_NOTES.md. The \"Ideas - write\" folder creates, updates and deletes its own idea, so it can be re-run.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "createdIdeaId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('status is ok', () => pm.expect(pm.response.json()).to.eql({ status: 'ok' }));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dictionaries",
+      "item": [
+        {
+          "name": "Materials (uk, default)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('30 materials with id, name, category', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.lengthOf(30);",
+                  "  body.forEach((m) => pm.expect(m).to.have.all.keys('id', 'name', 'category'));",
+                  "});",
+                  "pm.test('Ukrainian names', () => pm.expect(pm.response.json().find((m) => m.id === 8).name).to.eql('Скляна банка'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Materials (en)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials?lang=en",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "en"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('English names', () => pm.expect(pm.response.json().find((m) => m.id === 8).name).to.eql('Glass jar'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Materials - invalid lang (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/materials?lang=de",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "materials"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "de"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error envelope with code VALIDATION_ERROR', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "  pm.expect(body.error.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(body.error.message).to.be.a('string').and.not.empty;",
+                  "  if (body.error.details !== undefined) pm.expect(body.error.details).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tools",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tools?lang=en",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tools"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "en"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('12 tools with id and name', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.lengthOf(12);",
+                  "  body.forEach((t) => pm.expect(t).to.have.all.keys('id', 'name'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ideas - catalog",
+      "item": [
+        {
+          "name": "Catalog (all ideas)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('body is { items[], total }', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.items).to.be.an('array');",
+                  "  pm.expect(body.total).to.eql(body.items.length);",
+                  "});",
+                  "pm.test('25 seed ideas', () => pm.expect(pm.response.json().total).to.eql(25));",
+                  "pm.test('no matchType in catalog mode', () => pm.response.json().items.forEach((i) => pm.expect(i).to.not.have.property('matchType')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Catalog - difficulty filter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas?difficulty=hard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"],
+              "query": [
+                {
+                  "key": "difficulty",
+                  "value": "hard"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('body is { items[], total }', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.items).to.be.an('array');",
+                  "  pm.expect(body.total).to.eql(body.items.length);",
+                  "});",
+                  "pm.test('ids are [7,10,12,13,14,22,24]', () => {",
+                  "  pm.expect(pm.response.json().items.map((i) => i.id)).to.eql([7,10,12,13,14,22,24]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Catalog - category + difficulty",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas?category=garden&difficulty=easy,medium",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "garden"
+                },
+                {
+                  "key": "difficulty",
+                  "value": "easy,medium"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('body is { items[], total }', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.items).to.be.an('array');",
+                  "  pm.expect(body.total).to.eql(body.items.length);",
+                  "});",
+                  "pm.test('ids are [1,2,3,4,5]', () => {",
+                  "  pm.expect(pm.response.json().items.map((i) => i.id)).to.eql([1,2,3,4,5]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Catalog - search",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas?q=cork&lang=en",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "cork"
+                },
+                {
+                  "key": "lang",
+                  "value": "en"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('body is { items[], total }', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.items).to.be.an('array');",
+                  "  pm.expect(body.total).to.eql(body.items.length);",
+                  "});",
+                  "pm.test('ids are [9,11]', () => {",
+                  "  pm.expect(pm.response.json().items.map((i) => i.id)).to.eql([9,11]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Catalog - sort newest",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas?sort=newest",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "newest"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('newest first', () => pm.expect(pm.response.json().items.slice(0, 3).map((i) => i.id)).to.eql([14, 10, 22]));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Catalog - invalid sort (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas?sort=random",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "random"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error envelope with code VALIDATION_ERROR', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "  pm.expect(body.error.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(body.error.message).to.be.a('string').and.not.empty;",
+                  "  if (body.error.details !== undefined) pm.expect(body.error.details).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ideas - recommendations",
+      "item": [
+        {
+          "name": "S1: full + partial",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas?materials=1,20,27,15",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"],
+              "query": [
+                {
+                  "key": "materials",
+                  "value": "1,20,27,15"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('body is { items[], total }', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.items).to.be.an('array');",
+                  "  pm.expect(body.total).to.eql(body.items.length);",
+                  "});",
+                  "pm.test('ids are [2,1]', () => {",
+                  "  pm.expect(pm.response.json().items.map((i) => i.id)).to.eql([2,1]);",
+                  "});",
+                  "pm.test('2 is full, 1 is partial missing 22', () => {",
+                  "  const [first, second] = pm.response.json().items;",
+                  "  pm.expect(first.matchType).to.eql('full');",
+                  "  pm.expect(first.missingMaterials).to.eql([]);",
+                  "  pm.expect(second.matchType).to.eql('partial');",
+                  "  pm.expect(second.missingMaterials.map((m) => m.id)).to.eql([22]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S5: several results",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas?materials=4,21,22",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"],
+              "query": [
+                {
+                  "key": "materials",
+                  "value": "4,21,22"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('ids are [18,21,22]', () => {",
+                  "  pm.expect(pm.response.json().items.map((i) => i.id)).to.eql([18,21,22]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S9: full before partial",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas?materials=8,29,22",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"],
+              "query": [
+                {
+                  "key": "materials",
+                  "value": "8,29,22"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('ids are [12,17]', () => {",
+                  "  pm.expect(pm.response.json().items.map((i) => i.id)).to.eql([12,17]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "S8: empty result",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas?materials=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"],
+              "query": [
+                {
+                  "key": "materials",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('empty list', () => pm.expect(pm.response.json()).to.eql({ items: [], total: 0 }));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid materials list (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas?materials=1,,2",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"],
+              "query": [
+                {
+                  "key": "materials",
+                  "value": "1,,2"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error envelope with code VALIDATION_ERROR', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "  pm.expect(body.error.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(body.error.message).to.be.a('string').and.not.empty;",
+                  "  if (body.error.details !== undefined) pm.expect(body.error.details).to.be.an('array');",
+                  "});",
+                  "pm.test('details point at materials', () => pm.expect(pm.response.json().error.details[0].field).to.eql('materials'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ideas - details",
+      "item": [
+        {
+          "name": "Idea 19 (en)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas/19?lang=en",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas", "19"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "en"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('master class shape', () => {",
+                  "  const idea = pm.response.json();",
+                  "  pm.expect(idea).to.include.keys('id', 'title', 'category', 'difficulty', 'estimatedTime', 'photoUrl', 'createdAt', 'updatedAt', 'materials', 'tools', 'steps');",
+                  "  pm.expect(idea.title).to.eql('Newspaper origami boats');",
+                  "  pm.expect(idea.steps.map((s) => s.number)).to.eql([1, 2, 3, 4, 5]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Idea not found (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas/9999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas", "9999"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 404', () => pm.response.to.have.status(404));",
+                  "pm.test('error envelope with code NOT_FOUND', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "  pm.expect(body.error.code).to.eql('NOT_FOUND');",
+                  "  pm.expect(body.error.message).to.be.a('string').and.not.empty;",
+                  "  if (body.error.details !== undefined) pm.expect(body.error.details).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid idea id (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas/abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas", "abc"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error envelope with code VALIDATION_ERROR', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "  pm.expect(body.error.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(body.error.message).to.be.a('string').and.not.empty;",
+                  "  if (body.error.details !== undefined) pm.expect(body.error.details).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ideas - write",
+      "item": [
+        {
+          "name": "Create idea (201)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "lang",
+                  "value": "en",
+                  "type": "text"
+                },
+                {
+                  "key": "title",
+                  "value": "Postman bottle lantern",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Created from the Postman collection.",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "decor",
+                  "type": "text"
+                },
+                {
+                  "key": "difficulty",
+                  "value": "easy",
+                  "type": "text"
+                },
+                {
+                  "key": "estimatedTime",
+                  "value": "25",
+                  "type": "text"
+                },
+                {
+                  "key": "materials",
+                  "value": "[{\"materialId\":1,\"isRequired\":true,\"quantity\":\"1 pc\"},{\"materialId\":22,\"isRequired\":false}]",
+                  "type": "text"
+                },
+                {
+                  "key": "tools",
+                  "value": "[1,3]",
+                  "type": "text"
+                },
+                {
+                  "key": "steps",
+                  "value": "[\"Cut the bottle in half\",\"Paint the outside\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "public/images/seed/bottle-bird-feeder.jpg"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Location header points at the new idea', () => {",
+                  "  const idea = pm.response.json();",
+                  "  pm.expect(pm.response.headers.get('Location')).to.eql(`/api/ideas/${idea.id}`);",
+                  "  pm.expect(idea.title).to.eql('Postman bottle lantern');",
+                  "  pm.expect(idea.photoUrl).to.match(/^\\/uploads\\/.+\\.jpg$/);",
+                  "  pm.collectionVariables.set('createdIdeaId', idea.id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Created idea in uk (falls back to en)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas/{{createdIdeaId}}?lang=uk",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas", "{{createdIdeaId}}"],
+              "query": [
+                {
+                  "key": "lang",
+                  "value": "uk"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('title falls back to the submitted language', () => pm.expect(pm.response.json().title).to.eql('Postman bottle lantern'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update idea (200, photo kept)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas/{{createdIdeaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas", "{{createdIdeaId}}"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "lang",
+                  "value": "en",
+                  "type": "text"
+                },
+                {
+                  "key": "title",
+                  "value": "Postman bottle lantern (edited)",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Created from the Postman collection.",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "decor",
+                  "type": "text"
+                },
+                {
+                  "key": "difficulty",
+                  "value": "medium",
+                  "type": "text"
+                },
+                {
+                  "key": "estimatedTime",
+                  "value": "25",
+                  "type": "text"
+                },
+                {
+                  "key": "materials",
+                  "value": "[{\"materialId\":1,\"isRequired\":true,\"quantity\":\"1 pc\"},{\"materialId\":22,\"isRequired\":false}]",
+                  "type": "text"
+                },
+                {
+                  "key": "tools",
+                  "value": "[1,3]",
+                  "type": "text"
+                },
+                {
+                  "key": "steps",
+                  "value": "[\"Cut the bottle\",\"Paint it\",\"Add a candle\"]",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('fields are replaced', () => {",
+                  "  const idea = pm.response.json();",
+                  "  pm.expect(idea.title).to.eql('Postman bottle lantern (edited)');",
+                  "  pm.expect(idea.difficulty).to.eql('medium');",
+                  "  pm.expect(idea.steps).to.have.lengthOf(3);",
+                  "  pm.expect(idea.photoUrl).to.match(/^\\/uploads\\//);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create without photo (400)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "lang",
+                  "value": "en",
+                  "type": "text"
+                },
+                {
+                  "key": "title",
+                  "value": "Postman bottle lantern",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Created from the Postman collection.",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "decor",
+                  "type": "text"
+                },
+                {
+                  "key": "difficulty",
+                  "value": "easy",
+                  "type": "text"
+                },
+                {
+                  "key": "estimatedTime",
+                  "value": "25",
+                  "type": "text"
+                },
+                {
+                  "key": "materials",
+                  "value": "[{\"materialId\":1,\"isRequired\":true,\"quantity\":\"1 pc\"},{\"materialId\":22,\"isRequired\":false}]",
+                  "type": "text"
+                },
+                {
+                  "key": "tools",
+                  "value": "[1,3]",
+                  "type": "text"
+                },
+                {
+                  "key": "steps",
+                  "value": "[\"Cut the bottle in half\",\"Paint the outside\"]",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('error envelope with code VALIDATION_ERROR', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "  pm.expect(body.error.code).to.eql('VALIDATION_ERROR');",
+                  "  pm.expect(body.error.message).to.be.a('string').and.not.empty;",
+                  "  if (body.error.details !== undefined) pm.expect(body.error.details).to.be.an('array');",
+                  "});",
+                  "pm.test('photo is reported', () => pm.expect(pm.response.json().error.details.map((d) => d.field)).to.include('photo'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create with non-image photo (415)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "lang",
+                  "value": "en",
+                  "type": "text"
+                },
+                {
+                  "key": "title",
+                  "value": "Postman bottle lantern",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Created from the Postman collection.",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "decor",
+                  "type": "text"
+                },
+                {
+                  "key": "difficulty",
+                  "value": "easy",
+                  "type": "text"
+                },
+                {
+                  "key": "estimatedTime",
+                  "value": "25",
+                  "type": "text"
+                },
+                {
+                  "key": "materials",
+                  "value": "[{\"materialId\":1,\"isRequired\":true,\"quantity\":\"1 pc\"},{\"materialId\":22,\"isRequired\":false}]",
+                  "type": "text"
+                },
+                {
+                  "key": "tools",
+                  "value": "[1,3]",
+                  "type": "text"
+                },
+                {
+                  "key": "steps",
+                  "value": "[\"Cut the bottle in half\",\"Paint the outside\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "package.json"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 415', () => pm.response.to.have.status(415));",
+                  "pm.test('error envelope with code UNSUPPORTED_MEDIA_TYPE', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "  pm.expect(body.error.code).to.eql('UNSUPPORTED_MEDIA_TYPE');",
+                  "  pm.expect(body.error.message).to.be.a('string').and.not.empty;",
+                  "  if (body.error.details !== undefined) pm.expect(body.error.details).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create with JSON body (415)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"JSON idea\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 415', () => pm.response.to.have.status(415));",
+                  "pm.test('error envelope with code UNSUPPORTED_MEDIA_TYPE', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "  pm.expect(body.error.code).to.eql('UNSUPPORTED_MEDIA_TYPE');",
+                  "  pm.expect(body.error.message).to.be.a('string').and.not.empty;",
+                  "  if (body.error.details !== undefined) pm.expect(body.error.details).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete idea (204)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas/{{createdIdeaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas", "{{createdIdeaId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": ["pm.test('status is 204', () => pm.response.to.have.status(204));"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Deleted idea (404)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas/{{createdIdeaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas", "{{createdIdeaId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 404', () => pm.response.to.have.status(404));",
+                  "pm.test('error envelope with code NOT_FOUND', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "  pm.expect(body.error.code).to.eql('NOT_FOUND');",
+                  "  pm.expect(body.error.message).to.be.a('string').and.not.empty;",
+                  "  if (body.error.details !== undefined) pm.expect(body.error.details).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete again (404)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ideas/{{createdIdeaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ideas", "{{createdIdeaId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status is 404', () => pm.response.to.have.status(404));",
+                  "pm.test('error envelope with code NOT_FOUND', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "  pm.expect(body.error.code).to.eql('NOT_FOUND');",
+                  "  pm.expect(body.error.message).to.be.a('string').and.not.empty;",
+                  "  if (body.error.details !== undefined) pm.expect(body.error.details).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

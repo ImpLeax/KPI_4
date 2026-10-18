@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title data-i18n="meta.catalogTitle"></title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script type="module" src="/js/pages/catalog.js"></script>
+  </head>
+  <body class="min-h-dvh">
+    <a href="#main" class="skip-link" data-i18n="nav.skip"></a>
+    <div id="site-header"></div>
+
+    <main id="main" tabindex="-1" class="focus:outline-none">
+      <!-- Hero: organic sage shape framing a project photo, as in the client's reference -->
+      <section class="relative overflow-hidden" aria-labelledby="hero-title">
+        <svg
+          class="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[62%] text-sage-300 lg:block"
+          viewBox="0 0 800 700"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            fill="currentColor"
+            d="M190 0C110 80 190 170 120 270C60 360 0 400 30 500C52 580 30 640 0 700H800V0Z"
+          />
+        </svg>
+
+        <div
+          class="container-page relative grid items-center gap-12 pb-28 pt-4 sm:pt-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-16 lg:pb-36"
+        >
+          <div class="hero-rise">
+            <h1
+              id="hero-title"
+              class="max-w-[13ch] text-[2.5rem] leading-[1.05] text-ink sm:text-6xl lg:text-[4.1rem]"
+              data-i18n="hero.title"
+            ></h1>
+            <p class="mt-6 max-w-[36rem] text-lg text-ink-muted" data-i18n="hero.lead"></p>
+            <a href="#filters" class="btn btn-primary mt-8 px-7 text-lg" data-i18n="hero.cta"></a>
+
+            <ul class="mt-10 flex flex-wrap gap-x-6 gap-y-4">
+              <li class="flex items-center gap-3">
+                <span
+                  class="flex size-11 flex-none items-center justify-center rounded-full bg-sage-200 text-forest"
+                >
+                  <span data-icon="listOrdered" data-icon-class="size-5"></span>
+                </span>
+                <span
+                  class="max-w-[11rem] text-sm font-semibold leading-snug"
+                  data-i18n="hero.feature1"
+                ></span>
+              </li>
+              <li class="flex items-center gap-3">
+                <span
+                  class="flex size-11 flex-none items-center justify-center rounded-full bg-sage-200 text-forest"
+                >
+                  <span data-icon="leaf" data-icon-class="size-5"></span>
+                </span>
+                <span
+                  class="max-w-[11rem] text-sm font-semibold leading-snug"
+                  data-i18n="hero.feature2"
+                ></span>
+              </li>
+              <li class="flex items-center gap-3">
+                <span
+                  class="flex size-11 flex-none items-center justify-center rounded-full bg-sage-200 text-forest"
+                >
+                  <span data-icon="home" data-icon-class="size-5"></span>
+                </span>
+                <span
+                  class="max-w-[11rem] text-sm font-semibold leading-snug"
+                  data-i18n="hero.feature3"
+                ></span>
+              </li>
+            </ul>
+          </div>
+
+          <figure class="hero-rise-delay relative mx-auto w-full max-w-xl lg:max-w-none">
+            <div class="blob-frame relative bg-sage-300 p-3 sm:p-4 lg:bg-transparent lg:p-0">
+              <img
+                id="hero-photo"
+                class="blob-frame aspect-[16/10] w-full bg-sage-200 object-cover shadow-lift sm:aspect-[5/4]"
+                alt=""
+                width="800"
+                height="640"
+              />
+            </div>
+            <figcaption
+              id="hero-badge"
+              class="absolute -bottom-6 right-4 flex items-center gap-3 rounded-[1.5rem] bg-paper px-4 py-3 shadow-soft sm:right-8"
+              hidden
+            >
+              <span
+                class="flex size-10 flex-none items-center justify-center rounded-full bg-sage-200 text-forest"
+              >
+                <span data-icon="recycle" data-icon-class="size-5"></span>
+              </span>
+              <span class="leading-tight">
+                <span id="hero-count" class="block font-display text-2xl font-bold text-ink"></span>
+                <span id="hero-count-label" class="block text-sm text-ink-muted"></span>
+              </span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <svg
+          class="pointer-events-none absolute inset-x-0 bottom-0 h-16 w-full sm:h-24"
+          viewBox="0 0 1440 120"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            class="fill-sage-200"
+            d="M0 64C220 10 420 18 640 52C880 90 1120 96 1440 30V120H0Z"
+          />
+          <path class="fill-cream" d="M0 92C260 52 480 60 720 84C960 108 1200 110 1440 70V120H0Z" />
+        </svg>
+      </section>
+
+      <!-- Catalog: filters on the left, results on the right -->
+      <section id="catalog" class="container-page mt-6" aria-labelledby="results-title">
+        <div class="grid gap-8 lg:grid-cols-[21.5rem_minmax(0,1fr)] lg:items-start">
+          <aside
+            id="filters"
+            class="panel scroll-mt-6 p-5 sm:p-6"
+            aria-labelledby="filters-title"
+            data-testid="filters-panel"
+          >
+            <h2 id="filters-title" class="text-2xl text-ink" data-i18n="filters.title"></h2>
+
+            <div class="mt-5">
+              <label for="search" class="field-label" data-i18n="filters.search"></label>
+              <div class="relative">
+                <span
+                  class="pointer-events-none absolute inset-y-0 left-4 flex items-center text-forest"
+                  aria-hidden="true"
+                >
+                  <span data-icon="search" data-icon-class="size-5"></span>
+                </span>
+                <input
+                  id="search"
+                  name="q"
+                  type="search"
+                  maxlength="100"
+                  autocomplete="off"
+                  class="input pl-11"
+                  data-i18n-placeholder="filters.searchPlaceholder"
+                  data-testid="search-input"
+                />
+              </div>
+            </div>
+
+            <div
+              class="mt-6"
+              role="group"
+              aria-labelledby="materials-title"
+              data-testid="materials-panel"
+            >
+              <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                <h3
+                  id="materials-title"
+                  class="text-lg text-ink"
+                  data-i18n="filters.materials"
+                ></h3>
+                <span id="materials-count" class="text-sm font-bold text-forest-dark" hidden></span>
+              </div>
+              <p class="mt-1 text-sm text-ink-muted" data-i18n="filters.materialsHint"></p>
+
+              <button
+                id="materials-toggle"
+                type="button"
+                class="btn btn-ghost mt-3 w-full justify-between lg:hidden"
+                aria-expanded="false"
+                aria-controls="materials-groups"
+                data-testid="materials-toggle"
+              >
+                <span id="materials-toggle-label"></span>
+                <span data-icon="chevronDown" data-icon-class="size-5"></span>
+              </button>
+
+              <div id="materials-groups" class="mt-4 flex flex-col gap-4 max-lg:hidden"></div>
+              <p
+                id="materials-error"
+                class="field-error"
+                role="alert"
+                hidden
+                data-i18n="filters.materialsError"
+              ></p>
+
+              <button
+                id="materials-clear"
+                type="button"
+                class="mt-3 min-h-11 rounded-full px-1 text-sm font-bold text-forest-dark underline underline-offset-4 hover:text-ink"
+                data-i18n="filters.clearMaterials"
+                hidden
+              ></button>
+            </div>
+
+            <div class="mt-6" role="group" aria-labelledby="difficulty-title">
+              <h3
+                id="difficulty-title"
+                class="text-lg text-ink"
+                data-i18n="filters.difficulty"
+              ></h3>
+              <div class="mt-3 flex flex-wrap gap-2" data-testid="difficulty-filter">
+                <button type="button" class="chip" aria-pressed="false" data-difficulty="easy">
+                  <span data-icon="check" data-icon-class="chip-check size-4"></span>
+                  <span data-i18n="difficulty.easy"></span>
+                </button>
+                <button type="button" class="chip" aria-pressed="false" data-difficulty="medium">
+                  <span data-icon="check" data-icon-class="chip-check size-4"></span>
+                  <span data-i18n="difficulty.medium"></span>
+                </button>
+                <button type="button" class="chip" aria-pressed="false" data-difficulty="hard">
+                  <span data-icon="check" data-icon-class="chip-check size-4"></span>
+                  <span data-i18n="difficulty.hard"></span>
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <label
+                for="category"
+                class="field-label text-lg font-display"
+                data-i18n="filters.category"
+              ></label>
+              <select id="category" name="category" class="input" data-testid="category-select">
+                <option value="" data-i18n="filters.allCategories"></option>
+                <option value="decor" data-i18n="category.decor"></option>
+                <option value="storage" data-i18n="category.storage"></option>
+                <option value="garden" data-i18n="category.garden"></option>
+                <option value="toys" data-i18n="category.toys"></option>
+                <option value="accessories" data-i18n="category.accessories"></option>
+                <option value="household" data-i18n="category.household"></option>
+              </select>
+            </div>
+
+            <button
+              id="filters-reset"
+              type="button"
+              class="btn btn-ghost mt-6 w-full"
+              data-i18n="filters.reset"
+              data-testid="filters-reset"
+            ></button>
+          </aside>
+
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <h2
+                  id="results-title"
+                  class="text-3xl text-ink sm:text-4xl"
+                  data-i18n="results.title"
+                ></h2>
+                <p
+                  id="results-status"
+                  class="mt-1 font-semibold text-ink-muted"
+                  role="status"
+                  aria-live="polite"
+                  aria-atomic="true"
+                  data-testid="results-status"
+                ></p>
+              </div>
+              <div class="flex w-full items-center gap-3 sm:w-auto">
+                <label
+                  for="sort"
+                  class="flex-none text-sm font-bold"
+                  data-i18n="filters.sort"
+                ></label>
+                <select id="sort" name="sort" class="input sm:w-56" data-testid="sort-select">
+                  <option value="difficulty_asc" data-i18n="sort.difficulty_asc"></option>
+                  <option value="difficulty_desc" data-i18n="sort.difficulty_desc"></option>
+                  <option value="time_asc" data-i18n="sort.time_asc"></option>
+                  <option value="newest" data-i18n="sort.newest"></option>
+                </select>
+              </div>
+            </div>
+
+            <p
+              id="mode-hint"
+              class="mt-4 flex items-start gap-2 rounded-2xl bg-sage-100 px-4 py-3 text-sm text-ink"
+              hidden
+            >
+              <span data-icon="sprout" data-icon-class="mt-0.5 size-5 flex-none text-forest"></span>
+              <span data-i18n="results.modeHint"></span>
+            </p>
+
+            <div
+              id="results-grid"
+              class="mt-6 grid gap-6 transition-opacity sm:grid-cols-2 xl:grid-cols-3"
+              aria-busy="true"
+              data-testid="results-grid"
+            ></div>
+
+            <div
+              id="empty-state"
+              class="mt-6 flex flex-col items-center rounded-[2rem] border-2 border-dashed border-sage-300 bg-paper px-6 py-14 text-center"
+              data-testid="empty-state"
+              hidden
+            >
+              <span
+                class="flex size-16 items-center justify-center rounded-full bg-sage-200 text-forest"
+              >
+                <span data-icon="sprout" data-icon-class="size-8"></span>
+              </span>
+              <p
+                class="mt-5 font-display text-2xl font-bold text-ink"
+                data-i18n="results.empty"
+              ></p>
+              <p class="mt-2 max-w-md text-ink-muted" data-i18n="results.emptyHint"></p>
+              <div class="mt-7 flex flex-wrap justify-center gap-3">
+                <button
+                  id="empty-reset"
+                  type="button"
+                  class="btn btn-forest"
+                  data-i18n="filters.reset"
+                ></button>
+                <a href="/idea-form.html" class="btn btn-ghost" data-i18n="results.emptyAdd"></a>
+              </div>
+            </div>
+
+            <div
+              id="error-state"
+              class="mt-6 flex flex-col items-center rounded-[2rem] bg-danger-soft px-6 py-12 text-center"
+              role="alert"
+              data-testid="error-state"
+              hidden
+            >
+              <span data-icon="alert" data-icon-class="size-10 text-danger"></span>
+              <p
+                class="mt-4 font-display text-2xl font-bold text-ink"
+                data-i18n="results.errorTitle"
+              ></p>
+              <p id="error-text" class="mt-2 max-w-md text-ink"></p>
+              <button id="retry" type="button" class="btn btn-forest mt-6">
+                <span data-icon="rotate" data-icon-class="size-5"></span>
+                <span data-i18n="results.retry"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="site-footer"></div>
+  </body>
+</html>

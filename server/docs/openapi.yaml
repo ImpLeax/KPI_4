@@ -1,0 +1,354 @@
+openapi: 3.0.3
+info:
+  title: Upcycling Ideas API
+  version: 1.0.0
+  description: |
+    REST API of the upcycling recommendation system (KPI, TV-42, variant 15).
+
+    * Every read endpoint accepts `lang` (`uk` | `en`, default `uk`). Text fields are returned in that
+      language, falling back to the other language when a translation is missing.
+    * Errors always have the shape `{ "error": { "code", "message", "details"? } }`.
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: Ideas
+  - name: Dictionaries
+  - name: System
+
+paths:
+  /api/health:
+    get:
+      tags: [System]
+      summary: Health check
+      responses:
+        '200':
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: ok }
+
+  /api/materials:
+    get:
+      tags: [Dictionaries]
+      summary: List all materials (ordered by category, then name)
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+      responses:
+        '200':
+          description: Materials
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Material' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+
+  /api/tools:
+    get:
+      tags: [Dictionaries]
+      summary: List all tools (ordered by name)
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+      responses:
+        '200':
+          description: Tools
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Tool' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+
+  /api/ideas:
+    get:
+      tags: [Ideas]
+      summary: Catalog / recommendations
+      description: |
+        Without `materials` returns the catalog filtered by `difficulty`, `category` and `q`.
+
+        With `materials` runs the recommendation algorithm:
+        * an idea is excluded if any **required** material is not selected;
+        * `matchType = full` when every material (required and optional) is selected;
+        * `matchType = partial` when exactly one **optional** material is missing (listed in `missingMaterials`);
+        * ideas missing two or more optional materials are excluded.
+
+        Ordering: `full` before `partial` (only in recommendation mode), then by `sort`, then by id.
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+        - name: materials
+          in: query
+          description: Comma-separated material ids selected by the user
+          schema: { type: string, example: '1,4,7' }
+        - name: difficulty
+          in: query
+          description: Comma-separated difficulty levels
+          schema: { type: string, example: 'easy,medium' }
+        - name: category
+          in: query
+          schema: { $ref: '#/components/schemas/IdeaCategory' }
+        - name: q
+          in: query
+          description: Case-insensitive substring search in the title (both languages), max 100 chars
+          schema: { type: string, maxLength: 100 }
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [difficulty_asc, difficulty_desc, time_asc, newest]
+            default: difficulty_asc
+      responses:
+        '200':
+          description: Ideas list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/IdeaSummary' }
+                  total: { type: integer }
+        '400': { $ref: '#/components/responses/ValidationError' }
+    post:
+      tags: [Ideas]
+      summary: Create a new idea
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/IdeaForm'
+                - type: object
+                  required: [photo]
+      responses:
+        '201':
+          description: Created idea (in the submitted `lang`)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IdeaDetail' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '415': { $ref: '#/components/responses/UnsupportedMediaType' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /api/ideas/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdeaId'
+    get:
+      tags: [Ideas]
+      summary: Idea details (master class)
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+      responses:
+        '200':
+          description: Idea
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IdeaDetail' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [Ideas]
+      summary: Update an idea
+      description: |
+        Replaces all fields. Text (title, description, steps) is written in `lang`, and the other
+        language's text for these fields is cleared so both languages show the edited content.
+        `photo` is optional; when omitted the current photo is kept.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: { $ref: '#/components/schemas/IdeaForm' }
+      responses:
+        '200':
+          description: Updated idea
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/IdeaDetail' }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '415': { $ref: '#/components/responses/UnsupportedMediaType' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+    delete:
+      tags: [Ideas]
+      summary: Delete an idea (and its uploaded photo)
+      responses:
+        '204': { description: Deleted }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+components:
+  parameters:
+    Lang:
+      name: lang
+      in: query
+      schema: { type: string, enum: [uk, en], default: uk }
+    IdeaId:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, minimum: 1 }
+
+  schemas:
+    Difficulty:
+      type: string
+      enum: [easy, medium, hard]
+    IdeaCategory:
+      type: string
+      enum: [decor, storage, garden, toys, accessories, household]
+    MaterialCategory:
+      type: string
+      enum: [plastic, paper, glass, textile, metal, other]
+
+    Material:
+      type: object
+      required: [id, name, category]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        category: { $ref: '#/components/schemas/MaterialCategory' }
+
+    Tool:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+
+    IdeaSummary:
+      type: object
+      required: [id, title, category, difficulty, estimatedTime, photoUrl, createdAt]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        category: { $ref: '#/components/schemas/IdeaCategory' }
+        difficulty: { $ref: '#/components/schemas/Difficulty' }
+        estimatedTime: { type: integer, description: Minutes }
+        photoUrl: { type: string, nullable: true, example: /images/seed/bottle-planter.jpg }
+        createdAt: { type: string, format: date-time }
+        matchType:
+          type: string
+          enum: [full, partial]
+          description: Present only when `materials` was supplied
+        missingMaterials:
+          type: array
+          description: Present only when `materials` was supplied (empty for full matches)
+          items: { $ref: '#/components/schemas/Material' }
+
+    IdeaDetail:
+      allOf:
+        - $ref: '#/components/schemas/IdeaSummary'
+        - type: object
+          required: [materials, tools, steps, updatedAt]
+          properties:
+            updatedAt: { type: string, format: date-time }
+            materials:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/Material'
+                  - type: object
+                    required: [isRequired]
+                    properties:
+                      isRequired: { type: boolean }
+                      quantity: { type: string, nullable: true, example: '2 pcs' }
+            tools:
+              type: array
+              items: { $ref: '#/components/schemas/Tool' }
+            steps:
+              type: array
+              items:
+                type: object
+                required: [number, text]
+                properties:
+                  number: { type: integer, minimum: 1 }
+                  text: { type: string }
+
+    IdeaForm:
+      type: object
+      description: |
+        multipart/form-data body. Complex fields (`materials`, `tools`, `steps`) are JSON-encoded strings.
+      required: [lang, title, category, difficulty, estimatedTime, materials, steps]
+      properties:
+        lang:
+          type: string
+          enum: [uk, en]
+          description: Language of the submitted text
+        title: { type: string, minLength: 3, maxLength: 120 }
+        description: { type: string, maxLength: 1000 }
+        category: { $ref: '#/components/schemas/IdeaCategory' }
+        difficulty: { $ref: '#/components/schemas/Difficulty' }
+        estimatedTime: { type: integer, minimum: 1, maximum: 1440 }
+        materials:
+          type: string
+          description: |
+            JSON array (1..20 items, unique materialId, at least one isRequired=true) of
+            `{ "materialId": number, "isRequired": boolean, "quantity"?: string (max 50) }`
+          example: '[{"materialId":1,"isRequired":true,"quantity":"1 pc"},{"materialId":5,"isRequired":false}]'
+        tools:
+          type: string
+          description: JSON array of unique tool ids (0..15 items)
+          example: '[1,3]'
+        steps:
+          type: string
+          description: JSON array of step texts in order (1..30 items, each 3..1000 chars)
+          example: '["Cut the bottle in half","Paint the outside"]'
+        photo:
+          type: string
+          format: binary
+          description: JPEG, PNG or WebP, max 5 MB (content signature is checked)
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [VALIDATION_ERROR, NOT_FOUND, PAYLOAD_TOO_LARGE, UNSUPPORTED_MEDIA_TYPE, RATE_LIMITED, INTERNAL_ERROR]
+            message: { type: string }
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field: { type: string }
+                  message: { type: string }
+
+  responses:
+    ValidationError:
+      description: Invalid input
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Idea not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    PayloadTooLarge:
+      description: Photo larger than 5 MB
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    UnsupportedMediaType:
+      description: Photo is not JPEG/PNG/WebP
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    RateLimited:
+      description: Too many write requests
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }

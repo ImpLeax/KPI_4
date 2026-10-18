@@ -1,0 +1,229 @@
+{
+  "meta": {
+    "catalogTitle": "Back in Use — upcycling ideas",
+    "ideaTitle": "{title} — Back in Use",
+    "ideaFallbackTitle": "Project guide — Back in Use",
+    "formCreateTitle": "New idea — Back in Use",
+    "formEditTitle": "Edit idea — Back in Use",
+    "notFoundTitle": "Page not found — Back in Use"
+  },
+  "brand": {
+    "name": "Back in Use",
+    "tagline": "upcycling ideas"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "catalog": "Catalog",
+    "addIdea": "Add idea",
+    "skip": "Skip to content"
+  },
+  "lang": {
+    "switchLabel": "Interface language",
+    "ukShort": "UA",
+    "enShort": "EN",
+    "ukFull": "Українська",
+    "enFull": "English"
+  },
+  "footer": {
+    "note": "A student project at Igor Sikorsky KPI, group TV-42",
+    "navLabel": "Footer links",
+    "api": "API documentation"
+  },
+  "hero": {
+    "title": "Make something new from what you already have",
+    "lead": "Tick what you have at home: bottles, jars, old clothes or cardboard. We'll match you with projects and step-by-step instructions.",
+    "cta": "Pick your materials",
+    "feature1": "Step-by-step guides",
+    "feature2": "Three difficulty levels",
+    "feature3": "Materials from home",
+    "countLabel": {
+      "one": "idea in the catalog",
+      "other": "ideas in the catalog"
+    }
+  },
+  "filters": {
+    "title": "Find an idea",
+    "search": "Search by title",
+    "searchPlaceholder": "For example, planter",
+    "materials": "What you have",
+    "materialsHint": "Tick the materials you have at home. With nothing ticked, you see the whole catalog.",
+    "selectedCount": {
+      "one": "{count} selected",
+      "other": "{count} selected"
+    },
+    "clearMaterials": "Clear all",
+    "showMaterials": "Show materials",
+    "hideMaterials": "Hide materials",
+    "materialsError": "Couldn't load the list of materials.",
+    "difficulty": "Difficulty",
+    "category": "Category",
+    "allCategories": "All categories",
+    "sort": "Sort by",
+    "reset": "Reset filters"
+  },
+  "sort": {
+    "difficulty_asc": "Easiest first",
+    "difficulty_desc": "Hardest first",
+    "time_asc": "Quickest first",
+    "newest": "Newest first"
+  },
+  "results": {
+    "title": "Ideas",
+    "count": {
+      "one": "{count} idea found",
+      "other": "{count} ideas found"
+    },
+    "loading": "Looking for ideas…",
+    "modeHint": "Ideas you have everything for come first, followed by ones missing a single optional material.",
+    "empty": "Nothing matches your request",
+    "emptyHint": "Try ticking more materials, clearing the difficulty filter or changing your search.",
+    "emptyAdd": "Add your own idea",
+    "errorTitle": "Couldn't load ideas",
+    "errorText": "Check your internet connection and try again.",
+    "retry": "Try again"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
+  },
+  "category": {
+    "decor": "Decor",
+    "storage": "Storage",
+    "garden": "Garden & plants",
+    "toys": "Toys",
+    "accessories": "Accessories",
+    "household": "Household"
+  },
+  "materialCategory": {
+    "plastic": "Plastic",
+    "paper": "Paper & cardboard",
+    "glass": "Glass",
+    "textile": "Textile",
+    "metal": "Metal",
+    "other": "Other"
+  },
+  "match": {
+    "full": "You have everything",
+    "partial": "Partial match",
+    "missing": "Missing: {materials}"
+  },
+  "time": {
+    "minutes": "{m} min",
+    "hours": "{h} h",
+    "hoursMinutes": "{h} h {m} min"
+  },
+  "idea": {
+    "back": "Back to catalog",
+    "loading": "Loading the guide…",
+    "edit": "Edit",
+    "delete": "Delete",
+    "difficultyLabel": "Difficulty",
+    "timeLabel": "Time",
+    "categoryLabel": "Category",
+    "materials": "Materials",
+    "required": "Required",
+    "optional": "Optional",
+    "tools": "Tools",
+    "noTools": "No special tools needed.",
+    "steps": "How to make it",
+    "stepsCount": {
+      "one": "{count} step",
+      "other": "{count} steps"
+    },
+    "notFoundTitle": "This idea doesn't exist",
+    "notFoundText": "It may have been deleted, or the link has a typo.",
+    "toCatalog": "Go to the catalog",
+    "loadErrorTitle": "Couldn't load this idea",
+    "deleteTitle": "Delete this idea?",
+    "deleteText": "“{title}” will be deleted together with its photo. This can't be undone.",
+    "deleteConfirm": "Yes, delete",
+    "deleteCancel": "Cancel",
+    "deleting": "Deleting…",
+    "deleteError": "Couldn't delete the idea. Please try again."
+  },
+  "form": {
+    "createTitle": "New idea",
+    "editTitle": "Edit idea",
+    "createLead": "Describe the project so someone else can repeat it: what they need and which steps to follow.",
+    "editLead": "Change the fields you need and save. You can keep the current photo.",
+    "langNote": "The text will be saved in English. If the idea had a Ukrainian version, this text will replace it.",
+    "requiredNote": "Fields marked with an asterisk are required.",
+    "basics": "Basics",
+    "title": "Title",
+    "titleHint": "3 to 120 characters.",
+    "category": "Category",
+    "categoryPlaceholder": "Choose a category",
+    "difficulty": "Difficulty",
+    "time": "Time needed",
+    "timeHint": "In minutes, from 1 to 1440 (24 hours).",
+    "minutesSuffix": "min",
+    "description": "Short description",
+    "descriptionHint": "Optional, up to 1000 characters.",
+    "charCount": "{count} / {max}",
+    "materials": "Materials",
+    "materialsHint": "Tick 1 to 20 materials. At least one must be required.",
+    "materialRequired": "Required",
+    "quantity": "Quantity",
+    "quantityPlaceholder": "e.g. 2 pcs",
+    "quantityLabel": "Quantity: {name}",
+    "requiredLabel": "{name} is required",
+    "tools": "Tools",
+    "toolsHint": "Optional, up to 15 tools.",
+    "steps": "Steps",
+    "stepsHint": "1 to 30 steps, each 3 to 1000 characters.",
+    "stepLabel": "Step {n}",
+    "stepPlaceholder": "What happens in this step?",
+    "addStep": "Add step",
+    "moveUp": "Move step {n} up",
+    "moveDown": "Move step {n} down",
+    "removeStep": "Remove step {n}",
+    "photo": "Project photo",
+    "photoHint": "JPG, PNG or WebP, up to 5 MB.",
+    "photoHintEdit": "JPG, PNG or WebP, up to 5 MB. If you don't pick a new photo, the current one stays.",
+    "photoChoose": "Choose photo",
+    "photoReplace": "Replace photo",
+    "photoPreviewAlt": "Photo preview",
+    "submitCreate": "Publish idea",
+    "submitEdit": "Save changes",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "loading": "Loading the form…",
+    "dictError": "Couldn't load materials and tools. Please reload the page.",
+    "errorSummaryTitle": "Check the form",
+    "errorSummaryText": "Fix the fields below and submit again:"
+  },
+  "validation": {
+    "titleLength": "The title must be 3 to 120 characters long.",
+    "categoryRequired": "Choose a category.",
+    "difficultyRequired": "Choose a difficulty.",
+    "timeRange": "Enter a whole number of minutes from 1 to 1440.",
+    "descriptionLength": "The description can be up to 1000 characters.",
+    "materialsRequired": "Choose at least one material.",
+    "materialsTooMany": "You can choose up to 20 materials.",
+    "materialsNeedRequired": "Mark at least one material as required.",
+    "quantityLength": "Quantity for “{name}” can be up to 50 characters.",
+    "toolsTooMany": "You can choose up to 15 tools.",
+    "stepsRequired": "Add at least one step.",
+    "stepsTooMany": "You can add up to 30 steps.",
+    "stepLength": "Step {n}: 3 to 1000 characters.",
+    "photoRequired": "Add a photo of the project.",
+    "photoType": "The photo must be a JPG, PNG or WebP file.",
+    "photoSize": "The photo is too large: 5 MB maximum.",
+    "server": "The server rejected this value: {message}"
+  },
+  "errors": {
+    "NETWORK_ERROR": "Can't reach the server. Check your connection and try again.",
+    "RATE_LIMITED": "Too many changes in a short time. Wait a minute and try again.",
+    "PAYLOAD_TOO_LARGE": "The photo is too large: 5 MB maximum.",
+    "UNSUPPORTED_MEDIA_TYPE": "The photo must be a JPG, PNG or WebP file.",
+    "NOT_FOUND": "Idea not found. It may have been deleted already.",
+    "VALIDATION_ERROR": "Some fields are filled in incorrectly.",
+    "generic": "Something went wrong on the server. Please try again a bit later."
+  },
+  "notFound": {
+    "title": "This page doesn't exist",
+    "text": "The link may be out of date. Start from the catalog — every idea is there.",
+    "back": "Go to the catalog"
+  }
+}

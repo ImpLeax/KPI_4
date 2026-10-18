@@ -1,0 +1,479 @@
+@import 'tailwindcss';
+
+/* Classes used inside JS modules (cards, rows built with DOM APIs) must be picked up too. */
+@source "../../public/**/*.{html,js}";
+
+@theme {
+  /* Palette follows the client's reference: warm cream, sage surfaces, deep forest, orange CTA. */
+  --color-cream: #f7efe1;
+  --color-paper: #fffbf3;
+  --color-line: #e4dac6;
+  --color-sage-100: #eef2e8;
+  --color-sage-200: #dce6d2;
+  --color-sage-300: #b9c9af;
+  --color-sage-400: #a3b799;
+  --color-forest: #3f5b45;
+  --color-forest-dark: #2f4635;
+  --color-ink: #24332a;
+  --color-ink-muted: #56634f;
+  --color-clay: #b85219;
+  --color-clay-dark: #9a3e0f;
+  --color-clay-soft: #f6dcc6;
+  --color-clay-bright: #e8894a;
+  --color-danger: #b03a2e;
+  --color-danger-soft: #f8e1dc;
+
+  --font-display: 'Balsamiq Sans', 'Nunito', ui-rounded, system-ui, sans-serif;
+  --font-sans: 'Nunito', ui-rounded, system-ui, sans-serif;
+
+  --radius-card: 1.75rem;
+  --radius-panel: 2rem;
+  --radius-blob: 3rem;
+
+  --shadow-soft: 0 1px 2px rgb(36 51 42 / 0.06), 0 10px 28px -14px rgb(36 51 42 / 0.28);
+  --shadow-lift: 0 2px 4px rgb(36 51 42 / 0.08), 0 18px 36px -16px rgb(36 51 42 / 0.32);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-clay-dark);
+    outline-offset: 3px;
+    border-radius: 0.5rem;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  button,
+  [role='button'],
+  label[for],
+  select,
+  summary {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  ::selection {
+    background: var(--color-sage-300);
+  }
+}
+
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 76rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 640px) {
+    .container-page {
+      padding-inline: 1.5rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    background: var(--color-forest-dark);
+    color: #fff;
+    font-weight: 700;
+  }
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.625rem 1.375rem;
+    border-radius: 999px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none;
+    touch-action: manipulation;
+    transition:
+      background-color 180ms ease,
+      color 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 120ms ease;
+  }
+  .btn:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  .btn:disabled {
+    opacity: 0.55;
+  }
+  /* A styled <label> that opens a visually hidden file input. */
+  .btn:has(+ input[type='file']:focus-visible) {
+    outline: 3px solid var(--color-clay-dark);
+    outline-offset: 3px;
+  }
+  .btn-primary {
+    background: var(--color-clay);
+    color: #fff;
+    box-shadow: 0 6px 16px -8px rgb(184 82 25 / 0.7);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-clay-dark);
+  }
+  .btn-forest {
+    background: var(--color-forest);
+    color: #fff;
+  }
+  .btn-forest:hover:not(:disabled) {
+    background: var(--color-forest-dark);
+  }
+  .btn-ghost {
+    background: var(--color-paper);
+    color: var(--color-forest-dark);
+    border: 1.5px solid var(--color-sage-300);
+  }
+  .btn-ghost:hover:not(:disabled) {
+    border-color: var(--color-forest);
+    background: var(--color-sage-100);
+  }
+  .btn-danger {
+    background: var(--color-paper);
+    color: var(--color-danger);
+    border: 1.5px solid currentColor;
+  }
+  .btn-danger:hover:not(:disabled) {
+    background: var(--color-danger-soft);
+  }
+  .btn-danger-solid {
+    background: var(--color-danger);
+    color: #fff;
+  }
+  .btn-danger-solid:hover:not(:disabled) {
+    background: #8f2c22;
+  }
+  .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex: none;
+    border-radius: 999px;
+    color: var(--color-forest-dark);
+    background: var(--color-paper);
+    border: 1.5px solid var(--color-line);
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease;
+  }
+  .btn-icon:hover:not(:disabled) {
+    background: var(--color-sage-100);
+    border-color: var(--color-sage-400);
+  }
+  .btn-icon:disabled {
+    opacity: 0.4;
+  }
+
+  /* Form controls */
+  .field-label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .field-hint {
+    margin-top: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--color-ink-muted);
+  }
+  .field-error {
+    margin-top: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-danger);
+  }
+  .input {
+    display: block;
+    width: 100%;
+    min-height: 2.875rem;
+    padding: 0.625rem 1rem;
+    border-radius: 1rem;
+    border: 1.5px solid var(--color-line);
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font: inherit;
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease;
+  }
+  .input::placeholder {
+    color: #7b8474;
+  }
+  .input:hover {
+    border-color: var(--color-sage-400);
+  }
+  .input:focus-visible {
+    outline: none;
+    border-color: var(--color-forest);
+    box-shadow: 0 0 0 3px rgb(63 91 69 / 0.25);
+  }
+  .input[aria-invalid='true'] {
+    border-color: var(--color-danger);
+  }
+  select.input {
+    appearance: none;
+    padding-right: 2.75rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233f5b45' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.125rem;
+  }
+  textarea.input {
+    min-height: 6rem;
+    resize: vertical;
+    line-height: 1.55;
+  }
+
+  /* Toggle chip: a label wrapping a visually hidden checkbox/radio, or a button with aria-pressed. */
+  .chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.5rem;
+    padding: 0.4rem 0.95rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--color-sage-300);
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    line-height: 1.2;
+    user-select: none;
+    touch-action: manipulation;
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      color 160ms ease;
+  }
+  .chip:hover {
+    border-color: var(--color-forest);
+  }
+  .chip .chip-check {
+    display: none;
+  }
+  .chip:has(input:checked),
+  .chip[aria-pressed='true'] {
+    background: var(--color-forest);
+    border-color: var(--color-forest);
+    color: #fff;
+  }
+  .chip:has(input:checked) .chip-check,
+  .chip[aria-pressed='true'] .chip-check {
+    display: inline-block;
+  }
+  .chip:has(input:focus-visible) {
+    outline: 3px solid var(--color-clay-dark);
+    outline-offset: 3px;
+  }
+  .chip input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+
+  .panel {
+    border-radius: var(--radius-panel);
+    background: var(--color-sage-200);
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-card);
+    background: var(--color-paper);
+    border: 1px solid var(--color-line);
+    box-shadow: var(--shadow-soft);
+    transition:
+      box-shadow 220ms var(--ease-out-soft),
+      transform 220ms var(--ease-out-soft);
+  }
+  .card:hover {
+    box-shadow: var(--shadow-lift);
+    transform: translateY(-2px);
+  }
+  .card:focus-within {
+    box-shadow: var(--shadow-lift);
+  }
+
+  .stretched-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-card);
+  }
+  .stretched-link:focus-visible {
+    outline: none;
+  }
+  .stretched-link:focus-visible::after {
+    outline: 3px solid var(--color-clay-dark);
+    outline-offset: 3px;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      100deg,
+      var(--color-sage-100) 30%,
+      var(--color-paper) 50%,
+      var(--color-sage-100) 70%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+
+  /* The organic photo frame from the reference: a soft blob instead of a plain rectangle. */
+  .blob-frame {
+    border-radius: 3.5rem 2.5rem 3.5rem 2.5rem / 3rem 3.5rem 2.5rem 3.5rem;
+  }
+
+  .step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    background: var(--color-sage-200);
+    color: var(--color-forest-dark);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+  }
+
+  dialog.dialog {
+    margin: auto;
+    width: min(28rem, calc(100% - 2rem));
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-panel);
+    background: var(--color-paper);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-lift);
+  }
+  dialog.dialog::backdrop {
+    background: rgb(36 51 42 / 0.45);
+  }
+  dialog.dialog[open] {
+    animation: dialog-in 200ms var(--ease-out-soft);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The one orchestrated moment: the hero settles in on page load. */
+.hero-rise {
+  animation: rise-in 700ms var(--ease-out-soft) both;
+}
+.hero-rise-delay {
+  animation: rise-in 700ms var(--ease-out-soft) 120ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .card:hover {
+    transform: none;
+  }
+}
